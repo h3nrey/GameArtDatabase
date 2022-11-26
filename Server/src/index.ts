@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.raw({ type: "application/vnd.custom-type" }));
 app.use(express.text({ type: "text/html" }));
 
-app.get("/", async (req, res) => {
+app.get("/home", async (req, res) => {
   const user = await prisma.user.findMany()
   // const user = {name: "geroge", age: 12}
 
