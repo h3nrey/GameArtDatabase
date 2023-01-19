@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import express from "express";
+import cors from "cors"
 
 const prisma = new PrismaClient();
 
@@ -9,26 +10,23 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.raw({ type: "application/vnd.custom-type" }));
 app.use(express.text({ type: "text/html" }));
+app.use(cors());
 
 app.get("/home", async (req, res) => {
-  const user = await prisma.user.findMany()
-  // const user = {name: "geroge", age: 12}
+  const posts = await prisma.post.findMany();  
 
-  res.json(user);
+  res.json(posts);
 });
 
+app.get("/user/:id", async(req, res) => {
+  const id = req.body.userId;
 
-app.get("/", async (req, res) => {
-  res.send(
-    `
-  <h1>Todo REST API</h1>
-  <h2>Available Routes</h2>
-  <pre>
-    GET, POST /home
-  </pre>
-  `.trim(),
-  );
-});
+  const user = await prisma.user.findUnique({
+    where:{
+      id: id,
+    }
+  })
+})
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
