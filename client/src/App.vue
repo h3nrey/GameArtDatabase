@@ -1,20 +1,47 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { GoogleAuthProvider, signInWithPopup, UserCredential} from "firebase/auth"
-import {auth} from "./services/firebase"
+import axios from 'axios';
+import { Interface } from "readline";
+import { userInfo } from "os";
+import useLocalStorage from "./services/useLocalStorage";
+const publicKey = useLocalStorage("userTolken",  "");
 
-const user = ref<UserCredential | null>(null);
 
-function HandleGoogleSignIn() {
-  const provider = new GoogleAuthProvider();
-  signInWithPopup(auth, provider)
-  .then((result) => {
-    user.value = result;
-    console.log(result);
-  })
-  .catch((error) => { 
+const baseUrl = "http://localhost:8000";
+
+interface userSignin{
+  email: String,
+  password: String,
+} 
+
+const userTolken = ref(publicKey.value)
+const user = ref<userSignin | null>(null);
+const email = ref("");
+const password = ref("")
+
+async function HandleSignIn(data: userSignin) {
+  try {
+    const reponse = await axios.post(`${baseUrl}/user/signin`, {
+      data: data
+    })   
+    console.log(reponse.data);
+
+  } catch (error) {
     console.error(error);
-  })
+  }
+}
+
+async function HandleLogin(data: userSignin) {
+  try{
+    const reponse = await axios.post(`${baseUrl}/user/login`, {
+      data: data
+    });
+    publicKey.value = 
+
+    console.log(reponse.data);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 </script>
@@ -24,9 +51,12 @@ function HandleGoogleSignIn() {
     <h1>Gameart Database</h1>
   </div>
   
-  <p v-if="user != null">{{user?.user.uid }}</p>
+  <p v-if="user != null">{{user.email}}</p>
 
-  <button @click="HandleGoogleSignIn">SignIn</button>
+  <input type="email" id="" v-model="email">
+  <input type="text" v-model="password">
+  <button @click="() => HandleLogin({email, password})">Login</button>
+  <button @click="() => HandleSignIn({email, password})">SignIn</button>
 </template>
 
 <style scoped>
